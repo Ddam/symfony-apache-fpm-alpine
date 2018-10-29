@@ -47,6 +47,13 @@
 # Embedded web-server pid file
 /.web-server-pid
 
+apache/ssl/*
+!apache/ssl/openssl.cnf
+!apache/ssl/certs/intermediate.cert.pem
+!apache/ssl/csr/.gitkeep
+!apache/ssl/newcerts/.gitkeep
+!apache/ssl/private/intermediate.key.pem
+
 ###> symfony/framework-bundle ###
 /.env
 /public/bundles/

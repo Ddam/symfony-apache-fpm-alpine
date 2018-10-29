@@ -11,15 +11,6 @@ if [ ${CONTAINER_ENV} = dev ]; then
         else
             composer install --no-suggest --no-progress
         fi;
-
-        # Init database
-        php -r "for(;;){if(@fsockopen('my-project-database',3306)){break;}};"
-        echo '[DB] Database service loaded'
-        echo '[DB] Drop database'
-        bin/console doctrine:database:drop -n --if-exists --force -vvv
-        echo '[DB] Create database'
-        bin/console doctrine:database:create -n
-        # TODO : load fixtures
     fi;
 
     echo 'Dev mode'
@@ -29,6 +20,6 @@ fi;
 
 # Permissions settings
 echo 'Permissions settings'
-chown -R www-data:www-data var
+chown -R www-data:www-data var public
 
 exec "$@"

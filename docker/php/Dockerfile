@@ -5,12 +5,16 @@ LABEL maintainer="Derivery Damien <damien.derivery@gmail.com>"
 ENV COMPOSER_VERSION 1.6.5
 
 # Install necessary libraries
-RUN apk --update add --no-cache --virtual .persistent-deps icu-dev gettext-dev libpng-dev zip unzip git bash \
+RUN apk --update add --no-cache --virtual .persistent-deps libintl icu icu-dev libxml2-dev libpng-dev bash \
+    && apk --no-cache add --virtual .phpize-deps $PHPIZE_DEPS; \
+        pecl install mongodb; \
+        docker-php-ext-enable mongodb ; \
+        apk del .phpize-deps \
     && rm -f /var/cache/apk/*
 RUN if [ "$CONTAINER_ENV" = "build" -o "$CONTAINER_ENV" = "dev" ] ; then apk add --no-cache --virtual .persistent-deps vim ; fi
 
 # Install necessary php extensions
-RUN docker-php-ext-install gettext bcmath intl json gd zip pdo_mysql
+RUN docker-php-ext-install bcmath intl gd zip
 
 RUN curl -s -f -L -o /tmp/installer.php https://raw.githubusercontent.com/composer/getcomposer.org/b107d959a5924af895807021fcef4ffec5a76aa9/web/installer \
     && php -r " \
@@ -31,6 +35,10 @@ COPY ./entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
 
 WORKDIR /var/www/html
+
+#RUN curl -L -u "${BITBUCKET_USER}:${BITBUCKET_PASSWORD}" "${BITBUCKET_REPOSITORY_URL}/get/${APP_VERSION}.tar.gz" -o /var/www/html/archive.tar.gz \
+#    && tar -zxvf /var/www/html/archive.tar.gz --strip 1 -C /var/www/html \
+#    && rm -rf /var/www/html/archive.tar.gz
 
 # Use the new entrypoint
 ENTRYPOINT ["entrypoint"]
